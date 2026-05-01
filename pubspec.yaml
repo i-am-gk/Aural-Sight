@@ -1,0 +1,72 @@
+name: aural_sight
+description: "Let Your Ears Guide Your Eyes."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Core packages
+  camera: ^0.12.0+1
+  flutter_tts: ^4.2.5
+  shared_preferences: ^2.5.5
+  provider: ^6.1.5+1
+  
+  # Voice Assistant (audio capture)
+  record: 6.2.0
+  permission_handler: 11.3.0
+  path_provider: ^2.1.5
+  vosk_flutter: 0.3.48
+
+  # Local database
+  hive: 2.2.3
+  hive_flutter: 1.1.0
+
+  # Object Detection
+  tflite_flutter: ^0.12.1
+  image: ^4.8.0
+
+  # OCR with ML Kit (offline)
+  google_mlkit_text_recognition: ^0.15.1
+
+  # Icons
+  cupertino_icons: ^1.0.9
+  
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  build_runner: ^2.4.13
+  hive_generator: ^2.0.1
+  flutter_launcher_icons: 0.14.4
+
+dependency_overrides:
+  permission_handler: 11.3.0
+  archive: 4.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/teammgh.png
+    - assets/model/ssd_mobilenet_v1.tflite
+    - assets/label/labels.txt
+    - assets/hey_luna_raw_model.tflite
+    - assets/command_model.tflite
+    - assets/labels.txt
+    - assets/vosk-model/
+    - assets/vosk-model/am/
+    - assets/vosk-model/conf/
+    - assets/vosk-model/graph/
+    - assets/vosk-model/graph/phones/
+    - assets/vosk-model/ivector/
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/myapplogo.png"

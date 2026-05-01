@@ -1,0 +1,9 @@
+background_noise_augmented
+change_theme-samples
+font_bigger-samples
+font_smaller-samples
+gesture_mode-samples
+go_back-samples
+object_detection-samples
+ocr_mode-samples
+open_setting-samples
