@@ -1,49 +1,53 @@
 # 👁️ Aural Sight
 
-**Aural Sight** is an AI-powered assistive mobile application developed as a Final Year Project to support visually impaired users through a fully offline voice-controlled smart assistant.
+**Aural Sight** is an AI-powered assistive mobile application developed as a **Final Year Project** to support visually impaired users through a fully offline voice-controlled smart assistant.
 
-The system combines computer vision, speech recognition, OCR, and gesture understanding to provide real-time assistance without requiring internet access.
+The application combines computer vision, speech recognition, OCR, and gesture recognition to provide real-time accessibility features without requiring an internet connection.
 
 ---
 
 ## ✨ Key Features
 
 ### 🎯 Object Detection Mode
-Detects surrounding objects in real time using **SSD MobileNet** trained on the **COCO dataset**. Helps identify daily objects such as chairs, bottles, people, doors, and more.
+Detects surrounding objects in real time using **SSD MobileNet** trained on the **COCO Dataset**. Helps users identify common objects such as bottles, chairs, people, doors, and more.
 
 ### 📖 OCR Reading Mode
-Reads printed text aloud from books, labels, medicine boxes, menus, signboards, and documents using **Google ML Kit OCR**.
+Reads printed text aloud from books, labels, medicine boxes, menus, and documents using **Google ML Kit OCR**.
 
 ### ✋ Gesture Recognition Mode
-Recognizes hand gestures for touch-free interaction using **MediaPipe** technology.
+Recognizes hand gestures for touch-free interaction using **MediaPipe**.
 
-### 🎙️ Voice Controlled Navigation
-The application can be operated through voice commands for hands-free accessibility.
+### 🎙️ Full Voice Control
+The application can be controlled through voice commands for complete hands-free accessibility.
 
 ### 🧠 Custom Wake Word Detection
 A custom-trained lightweight AI model continuously listens for:
 
 **"Hey Luna"**
 
-After activation, the system enters command mode.
+Once detected, the system enters command mode.
 
-### 🎤 Custom Command Recognition
-A second custom-trained model recognizes commands such as:
+### 🎤 Supported Voice Commands
 
 - Object Detection  
 - OCR Mode  
 - Gesture Mode  
 - Go Back  
-- Home  
-- Stop  
+- Open Settings  
+- Change Theme  
+- Font Bigger  
+- Font Smaller  
 
 ### 🔒 Fully Offline System
-Core features work completely offline, providing:
+Core features run locally on-device, ensuring:
 
 - Privacy  
 - Fast Response Time  
 - Reliable Performance  
 - Accessibility Anywhere  
+
+### 💾 On-Device Storage
+Uses **Hive Database** for lightweight local data storage and settings management.
 
 ---
 
@@ -55,29 +59,37 @@ Core features work completely offline, providing:
 - COCO Dataset  
 - Google ML Kit OCR  
 - MediaPipe  
+- Hive Database  
 - Python  
 - Google Colab  
 - Custom CNN Audio Models  
 
 ---
 
-## 🎓 Project Purpose
+## 📁 Project Structure
 
-The purpose of Aural Sight is to improve independence for visually impaired individuals by enabling them to hear surroundings, read text, detect objects, and control the application through voice.
-
----
-
-## 👥 Team Members
-
-**Team MGH**
-
-- Ghani Abdul Rehman Khan  
-- Sardar Hasnain Hamid  
-- Mahnoor Kalsoom  
-
----
-
-## 🏫 Academic Info
-
-Final Year Project  
-COMSATS University Islamabad, Abbottabad Campus
+```text
+aural_sight/
+├── android/
+├── ios/
+├── lib/
+│   ├── models/
+│   ├── providers/
+│   ├── screens/
+│   ├── services/
+│   ├── theme/
+│   ├── utils/
+│   └── widgets/
+├── assets/
+│   ├── images/
+│   ├── model/
+│   ├── models/
+│   ├── tessdata/
+│   └── vosk-model/
+├── windows/
+├── linux/
+├── macos/
+├── web/
+├── test/
+├── pubspec.yaml
+└── README.md
