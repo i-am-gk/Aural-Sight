@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/language_provider.dart';
+import '../utils/app_localization.dart';
 
 class UserProfileScreen extends StatelessWidget {
   const UserProfileScreen({super.key});
@@ -11,15 +12,15 @@ class UserProfileScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("User Profile Settings"),
+        title: Text(AppLocalizations.t(context, 'user_profile_settings')),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          _sectionTitle("Language"),
+          _sectionTitle(AppLocalizations.t(context, 'language')),
           _card(
             child: ListTile(
-              title: const Text("UI Language"),
+              title: Text(AppLocalizations.t(context, 'ui_language')),
               subtitle: Text(provider.language == "en" ? "English" : "اردو"),
               trailing: DropdownButton<String>(
                 value: provider.language,

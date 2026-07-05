@@ -13,9 +13,9 @@ class AppLocalizations {
       'text_sign_reading': 'Text/Sign Reading',
       'gesture_detection': 'Gesture Detection',
       'settings': 'Settings',
-      'ocr_mode': 'OCR Mode', // CHANGED
-      'gesture_mode': 'Gesture Mode', // CHANGED
-      'open_settings': 'Open Settings', // CHANGED
+      'ocr_mode': 'Word Reading', // CHANGED
+      'gesture_mode': 'Detect Hand', // CHANGED
+      'open_settings': 'Open Settings',  // CHANGED
       'back': 'Back',
       'speak': 'Speak',
       'capture_read': 'Capture & Read',
@@ -45,17 +45,22 @@ class AppLocalizations {
       'theme_dark': 'Dark',
       'theme_high_contrast': 'High Contrast',
       // add more keys as needed
+      'user_profile_settings': 'User Profile Settings',
+      'language': 'Language',
       'settings_user_profile': 'User Profile',
       'settings_user_profile_sub': 'Language, theme, accessibility',
 
       'settings_terms': 'Terms & Conditions',
       'settings_terms_sub': 'Read the app policies',
+      'terms_title': 'Terms & Conditions',
 
       'settings_legal': 'Legal Concerns',
       'settings_legal_sub': 'Copyright & disclaimers',
+      'legal_title': 'Legal Concerns',
 
       'settings_about': 'About Us',
       'settings_about_sub': 'Learn about AuralSight',
+      'about_title': 'About Us',
 
       'future_premium': 'Future Premium Features',
       'future_premium_sub': 'Cloud-based scene and navigation',
@@ -67,8 +72,8 @@ class AppLocalizations {
       'text_sign_reading': 'متن/اشارہ پڑھنا',
       'gesture_detection': 'اشارے کی شناخت',
       'settings': 'ترتیبات',
-      'ocr_mode': 'او سی آر موڈ', // CHANGED
-      'gesture_mode': 'جیسچر موڈ', // CHANGED
+  'ocr_mode': 'لفظ پڑھنا', // Word Reading
+'gesture_mode': 'ہاتھ کی شناخت', // Hand Detection
       'open_settings': 'سیٹنگز کھولیں', // CHANGED
       'back': 'واپس',
       'speak': 'بولیں',
@@ -99,17 +104,22 @@ class AppLocalizations {
       'theme_dark': 'ڈارک',
       'theme_high_contrast': 'ہائی کانٹراسٹ',
       // add more keys as needed
+      'user_profile_settings': 'یوزر پروفائل سیٹنگز',
+      'language': 'زبان',
       'settings_user_profile': 'یوزر پروفائل',
       'settings_user_profile_sub': 'زبان، تھیم، ایکسیسبیلٹی',
 
       'settings_terms': 'شرائط و ضوابط',
       'settings_terms_sub': 'ایپ کی پالیسی پڑھیں',
+      'terms_title': 'شرائط و ضوابط',
 
       'settings_legal': 'قانونی معلومات',
       'settings_legal_sub': 'کاپی رائٹس اور ڈسکلیمرز',
+      'legal_title': 'قانونی معلومات',
 
       'settings_about': 'ہمارے بارے میں',
       'settings_about_sub': 'اورل سائٹ کے بارے میں جانیں',
+      'about_title': 'ہمارے بارے میں',
 
       'future_premium': 'مستقبل کی پریمیم خصوصیات',
       'future_premium_sub': 'کلاؤڈ سے چلنے والی خصوصیات',

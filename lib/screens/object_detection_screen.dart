@@ -12,7 +12,8 @@ import '../utils/detection_constants.dart';
 import '../widgets/detection_box_overlay.dart';
 
 class ObjectDetectionScreen extends StatefulWidget {
-  const ObjectDetectionScreen({super.key});
+  final bool fromVoice;
+  const ObjectDetectionScreen({super.key, this.fromVoice = false});
 
   @override
   State<ObjectDetectionScreen> createState() =>
@@ -161,6 +162,10 @@ class _ObjectDetectionScreenState
       });
 
       setState(() => _isInitializing = false);
+
+      if (!_autoMode) {
+        _toggleAutoDetect(initialCall: true);
+      }
     } catch (e) {
       setState(() {
         _isInitializing = false;
@@ -179,7 +184,7 @@ class _ObjectDetectionScreenState
 
     final controller = CameraController(
       cameraDescription,
-      ResolutionPreset.medium,
+      ResolutionPreset.high,
       enableAudio: false,
       imageFormatGroup: ImageFormatGroup.yuv420,
     );
@@ -626,7 +631,7 @@ class _ObjectDetectionScreenState
     }
   }
 
-  Future<void> _toggleAutoDetect() async {
+  Future<void> _toggleAutoDetect({bool initialCall = false}) async {
     final settings = Provider.of<LanguageProvider>(context, listen: false);
     
     setState(() {
@@ -646,16 +651,20 @@ class _ObjectDetectionScreenState
 
     final messageKey = _autoMode ? 'auto_detect_started' : 'auto_detect_stopped';
     
-    await TtsService().stop();
-    await TtsService().speak(
-      AppLocalizations.t(context, messageKey),
-      lang: settings.ttsLanguage,
-    );
+    if (!initialCall || !widget.fromVoice) {
+      await TtsService().stop();
+      await TtsService().speak(
+        AppLocalizations.t(context, messageKey),
+        lang: settings.ttsLanguage,
+      );
 
-    // Let the "Auto detection started/stopped" finish
-    Future.delayed(const Duration(seconds: 2), () {
-      if (mounted) setState(() => _isPrioritySpeaking = false);
-    });
+      // Let the "Auto detection started/stopped" finish
+      Future.delayed(const Duration(seconds: 2), () {
+        if (mounted) setState(() => _isPrioritySpeaking = false);
+      });
+    } else {
+      setState(() => _isPrioritySpeaking = false);
+    }
   }
 
   void _startGuidanceTimer() {

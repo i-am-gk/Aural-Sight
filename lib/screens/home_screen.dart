@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../utils/app_localization.dart';
 import '../providers/language_provider.dart';
 import '../services/tts_service.dart';
+import '../services/wake_word_service.dart';
 
 import 'object_detection_screen.dart';
 import 'ocr_screen.dart';
@@ -20,6 +21,47 @@ class HomeScreen extends StatelessWidget {
     return Consumer<LanguageProvider>(
       builder: (context, provider, child) {
         return Scaffold(
+          // 🔥 MIC INDICATOR - Now in MIDDLE and BIGGER!
+          floatingActionButton: ValueListenableBuilder<bool>(
+            valueListenable: WakeWordService().isCommandModeNotifier,
+            builder: (context, isActive, child) {
+              if (!isActive) return const SizedBox.shrink();
+              
+              return TweenAnimationBuilder(
+                tween: Tween<double>(begin: 1.0, end: 1.15),
+                duration: const Duration(milliseconds: 800),
+                builder: (context, double scale, child) {
+                  return Transform.scale(
+                    scale: scale,
+                    child: child,
+                  );
+                },
+                child: Container(
+                  // 🔥 INCREASED SIZE - Bigger padding and icon
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.teal,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.teal.withOpacity(0.5),
+                        blurRadius: 30,
+                        spreadRadius: 10,
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.mic, 
+                    color: Colors.white, 
+                    size: 40, // 🔥 BIGGER ICON
+                  ),
+                ),
+              );
+            },
+          ),
+          // 🔥 POSITION - Move to MIDDLE (centered bottom)
+          floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+          
           body: SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(20),
@@ -72,7 +114,7 @@ class HomeScreen extends StatelessWidget {
                   // ----- OCR / Sign Reading -----
                   _buildTile(
                     context: context,
-                    title: AppLocalizations.t(context, 'ocr_mode'), // CHANGED
+                    title: AppLocalizations.t(context, 'ocr_mode'),
                     icon: Icons.text_fields,
                     screen: const OcrScreen(),
                     tts: tts,
@@ -84,7 +126,7 @@ class HomeScreen extends StatelessWidget {
                   // ----- Gestures -----
                   _buildTile(
                     context: context,
-                    title: AppLocalizations.t(context, 'gesture_mode'), // CHANGED
+                    title: AppLocalizations.t(context, 'gesture_mode'),
                     icon: Icons.back_hand,
                     screen: const GestureScreen(),
                     tts: tts,
@@ -96,7 +138,7 @@ class HomeScreen extends StatelessWidget {
                   // ----- Settings -----
                   _buildTile(
                     context: context,
-                    title: AppLocalizations.t(context, 'open_settings'), // CHANGED
+                    title: AppLocalizations.t(context, 'open_settings'),
                     icon: Icons.settings,
                     screen: const SettingsScreen(),
                     tts: tts,
