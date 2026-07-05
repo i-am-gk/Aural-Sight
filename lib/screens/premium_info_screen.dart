@@ -70,7 +70,7 @@ class PremiumInfoScreen extends StatelessWidget {
               const Divider(),
               const SizedBox(height: 10),
               Text(
-                "For premium access, collaboration, or inquiries, contact us: $email",
+                "For premium access, collaboration, or inquiries, contact us: $email\n",
                 style: const TextStyle(fontSize: 16, height: 1.5),
               ),
               const SizedBox(height: 8),

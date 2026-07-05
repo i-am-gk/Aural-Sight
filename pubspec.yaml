@@ -21,7 +21,8 @@ dependencies:
   record: 6.2.0
   permission_handler: 11.3.0
   path_provider: ^2.1.5
-  vosk_flutter: 0.3.48
+  url_launcher: ^6.1.0
+  vosk_flutter: ^0.3.0
 
   # Local database
   hive: 2.2.3
@@ -36,7 +37,10 @@ dependencies:
 
   # Icons
   cupertino_icons: ^1.0.9
-  
+
+  hand_detection: ^3.0.6
+  sensors_plus: ^6.1.2   # latest
+
 
 dev_dependencies:
   flutter_test:
@@ -47,26 +51,27 @@ dev_dependencies:
   flutter_launcher_icons: 0.14.4
 
 dependency_overrides:
-  permission_handler: 11.3.0
   archive: 4.0.0
+  permission_handler: ^12.0.1
+  permission_handler_android: ^13.0.1
+  permission_handler_apple: ^9.4.5
+  permission_handler_platform_interface: ^4.2.0
 
 flutter:
   uses-material-design: true
   assets:
     - assets/images/teammgh.png
     - assets/model/ssd_mobilenet_v1.tflite
+    - assets/model/hand_landmark.tflite
+    - assets/model/vosk-model-small-en-us-0.15.zip
     - assets/label/labels.txt
-    - assets/hey_luna_raw_model.tflite
-    - assets/command_model.tflite
-    - assets/labels.txt
-    - assets/vosk-model/
-    - assets/vosk-model/am/
-    - assets/vosk-model/conf/
-    - assets/vosk-model/graph/
-    - assets/vosk-model/graph/phones/
-    - assets/vosk-model/ivector/
+    - assets/images/mapplogo4.png
+
 
 flutter_icons:
   android: true
   ios: true
-  image_path: "assets/images/myapplogo.png"
+  image_path: "assets/images/mapplogo4.png"
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/images/mapplogo4.png"
+ 

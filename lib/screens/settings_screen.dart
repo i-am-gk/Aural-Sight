@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/language_provider.dart';
 import '../services/tts_service.dart';
 import '../utils/app_localization.dart';
 
@@ -9,10 +11,13 @@ import 'about_screen.dart';
 import 'premium_info_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({super.key});
+  final bool fromVoice;
+  const SettingsScreen({super.key, this.fromVoice = false});
 
   @override
   Widget build(BuildContext context) {
+    // ignore: unused_local_variable
+    final provider = Provider.of<LanguageProvider>(context);
     final tts = TtsService();
 
     final List<_SettingsItem> items = [

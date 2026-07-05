@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/language_provider.dart';
+import '../utils/app_localization.dart';
 
 class AboutScreen extends StatelessWidget {
   AboutScreen({super.key});
@@ -8,8 +11,9 @@ class AboutScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<LanguageProvider>(context);
     return Scaffold(
-      appBar: AppBar(title: const Text("About Us")),
+      appBar: AppBar(title: Text(AppLocalizations.t(context, 'about_title'))),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -45,19 +49,20 @@ class AboutScreen extends StatelessWidget {
 
             // Mission Statement
             const Text(
-              "AuralSight is developed to support visually impaired individuals through offline AI-powered assistance. It provides object detection, text reading (OCR), gesture recognition, and voice-guided interaction—helping users navigate their daily tasks with more independence.",
-              style: TextStyle(fontSize: 16, height: 1.5),
+              "AuralSight is an assistive application designed to support visually impaired individuals through offline AI-powered assistance. It provides object detection, text reading using OCR, gesture recognition, and voice-guided interaction. These features help users navigate their daily tasks with greater independence and confidence.",
+              style: TextStyle(fontSize: 16, height: 1.6),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
 
             // Privacy Statement
             const Text(
-              "All processing happens entirely on your device. No camera frames, text, speech, or user data is ever stored or sent to a server. Your privacy and safety remain completely protected.",
-              style: TextStyle(fontSize: 16, height: 1.5),
+              "All processing happens entirely on your device. Camera frames, text, speech, and user data are never stored or sent to any server. Your privacy and safety remain completely protected.",
+              style: TextStyle(fontSize: 16, height: 1.6),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
+
             // Contact Email
             Text(
               "Contact: $email",

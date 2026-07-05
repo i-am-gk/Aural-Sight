@@ -9,7 +9,8 @@ import '../providers/language_provider.dart';
 import '../utils/app_localization.dart';
 
 class OcrScreen extends StatefulWidget {
-  const OcrScreen({super.key});
+  final bool fromVoice;
+  const OcrScreen({super.key, this.fromVoice = false});
 
   @override
   State<OcrScreen> createState() => _OcrScreenState();
@@ -31,7 +32,11 @@ class _OcrScreenState extends State<OcrScreen> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _setupCamera();
+    _setupCamera().then((_) {
+      if (mounted && _isCameraInitialized && !_autoMode) {
+        _toggleAutoMode(initialCall: true);
+      }
+    });
   }
 
   @override
@@ -39,6 +44,7 @@ class _OcrScreenState extends State<OcrScreen> with WidgetsBindingObserver {
     WidgetsBinding.instance.removeObserver(this);
     _autoTimer?.cancel();
     _disposeCamera();
+    _tts.stop();
     super.dispose();
   }
 
@@ -68,7 +74,7 @@ class _OcrScreenState extends State<OcrScreen> with WidgetsBindingObserver {
 
       final controller = CameraController(
         camera,
-        ResolutionPreset.medium,
+        ResolutionPreset.high,
         enableAudio: false,
       );
 
@@ -99,21 +105,25 @@ class _OcrScreenState extends State<OcrScreen> with WidgetsBindingObserver {
   }
 
   /// AUTO MODE
-  void _toggleAutoMode() async {
+  void _toggleAutoMode({bool initialCall = false}) async {
     final settings = Provider.of<LanguageProvider>(context, listen: false);
 
     if (_autoMode) {
       _autoTimer?.cancel();
       setState(() => _autoMode = false);
-      await _tts.speak(AppLocalizations.t(context, 'auto_read_stopped'),
-          lang: settings.ttsLanguage);
+      if (!initialCall || !widget.fromVoice) {
+        await _tts.speak(AppLocalizations.t(context, 'auto_read_stopped'),
+            lang: settings.ttsLanguage);
+      }
       return;
     }
 
     setState(() => _autoMode = true);
 
-    await _tts.speak(AppLocalizations.t(context, 'auto_read_started'),
-        lang: settings.ttsLanguage);
+    if (!initialCall || !widget.fromVoice) {
+      await _tts.speak(AppLocalizations.t(context, 'auto_read_started'),
+          lang: settings.ttsLanguage);
+    }
 
     _autoTimer = Timer.periodic(
         const Duration(seconds: 5), (_) => _autoCaptureAndRead());
