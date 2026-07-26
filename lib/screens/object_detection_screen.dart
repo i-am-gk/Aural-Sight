@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/detected_object.dart';
 import '../services/detector_service.dart';
+import '../services/metrics_logger.dart';
 import '../services/tensorflow_service.dart';
 import '../services/tts_service.dart';
 import '../providers/language_provider.dart';
@@ -44,6 +45,8 @@ class _ObjectDetectionScreenState
 
   int _frameSkip = 0;
   int _lastProcessedTime = 0;
+  // [METRICS] Track when each frame was dispatched to measure response time
+  int _frameDispatchTime = 0;
 
   String? _lastSpokenLabel;
   DateTime? _lastSpokenTime;
@@ -156,6 +159,22 @@ class _ObjectDetectionScreenState
           if (_autoMode) {
             _handleTts(filtered);
           }
+
+          // [METRICS] Log object detection result (non-blocking, silent fail)
+          try {
+            final responseMs = DateTime.now().millisecondsSinceEpoch - _frameDispatchTime;
+            final bestDetection = filtered.isNotEmpty
+                ? filtered.reduce((a, b) => a.confidence > b.confidence ? a : b)
+                : null;
+            MetricsLogger().logDetection(
+              module: 'object_detection',
+              input: 'camera_frame',
+              actualOutput: bestDetection?.label ?? '[none]',
+              success: bestDetection != null && bestDetection.confidence >= 0.6,
+              confidence: bestDetection?.confidence ?? 0.0,
+              responseTime: responseMs / 1000.0,
+            );
+          } catch (_) {}
         }
 
         _isProcessingFrame = false;
@@ -209,6 +228,8 @@ class _ObjectDetectionScreenState
 
           _isProcessingFrame = true;
           _lastProcessedTime = now;
+          // [METRICS] Record dispatch time for response time calculation
+          _frameDispatchTime = now;
 
           // [NEW] Safer fallback unlock
           Future.delayed(const Duration(milliseconds: 300), () {
