@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../models/user_model.dart';
+import '../services/metrics_logger.dart';
 import '../services/settings_service.dart';
 import '../services/tts_service.dart';
 import '../services/wake_word_service.dart';
@@ -31,6 +32,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
     // Load Hive and prefs first (fast)
     await Hive.initFlutter();
     Hive.registerAdapter(UserModelAdapter());
+    // Initialize metrics logger (non-blocking, silently fails if Hive has issues)
+    await MetricsLogger().init();
     
     final prefs = await SharedPreferences.getInstance();
     final registered = prefs.getBool('registered') ?? false;

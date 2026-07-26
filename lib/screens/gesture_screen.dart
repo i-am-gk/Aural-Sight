@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hand_detection/hand_detection.dart';
 import '../services/gesture_detection_service.dart';
+import '../services/metrics_logger.dart';
 import '../services/tts_service.dart';
 import '../providers/language_provider.dart';
 import '../utils/app_localization.dart';
@@ -163,6 +164,8 @@ class _GestureScreenState extends State<GestureScreen>
 
     _isProcessing = true;
     _frameCount += 1;
+    // [METRICS] Measure gesture detection response time
+    final metricsStopwatch = Stopwatch()..start();
 
     final rotation = rotationForFrame(
       width: image.width,
@@ -213,6 +216,22 @@ class _GestureScreenState extends State<GestureScreen>
           });
         }
       }
+
+      // [METRICS] Log gesture detection result (non-blocking, silent fail)
+      try {
+        metricsStopwatch.stop();
+        final gestureDetected = hands.isNotEmpty;
+        final gestureType = hands.isNotEmpty ? (hands.first.gesture?.type.name ?? 'unknown') : 'none';
+        final confidence = hands.isNotEmpty ? 1.0 : 0.0;
+        MetricsLogger().logDetection(
+          module: 'gesture',
+          input: 'camera_frame',
+          actualOutput: gestureType,
+          success: gestureDetected && gestureType != 'unknown',
+          confidence: confidence,
+          responseTime: metricsStopwatch.elapsedMilliseconds / 1000.0,
+        );
+      } catch (_) {}
 
       setState(() {
         _gestureLabel = label;

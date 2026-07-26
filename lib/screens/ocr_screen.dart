@@ -4,6 +4,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:provider/provider.dart';
+import '../services/metrics_logger.dart';
 import '../services/tts_service.dart';
 import '../providers/language_provider.dart';
 import '../utils/app_localization.dart';
@@ -136,6 +137,8 @@ class _OcrScreenState extends State<OcrScreen> with WidgetsBindingObserver {
         _busy) return;
 
     final settings = Provider.of<LanguageProvider>(context, listen: false);
+    // [METRICS] Start response time measurement
+    final metricsStopwatch = Stopwatch()..start();
 
     try {
       _busy = true;
@@ -148,6 +151,19 @@ class _OcrScreenState extends State<OcrScreen> with WidgetsBindingObserver {
       await recognizer.close();
 
       final text = result.text.trim();
+
+      // [METRICS] Log OCR result (non-blocking, silent fail)
+      try {
+        metricsStopwatch.stop();
+        MetricsLogger().logDetection(
+          module: 'ocr',
+          input: 'camera_frame_auto',
+          actualOutput: text.isEmpty ? '[no_text]' : text.length > 80 ? '${text.substring(0, 80)}...' : text,
+          success: text.isNotEmpty,
+          confidence: text.isNotEmpty ? 1.0 : 0.0,
+          responseTime: metricsStopwatch.elapsedMilliseconds / 1000.0,
+        );
+      } catch (_) {}
 
       if (text.isEmpty || text == _lastReadText) return;
 
@@ -172,6 +188,8 @@ class _OcrScreenState extends State<OcrScreen> with WidgetsBindingObserver {
         _busy) return;
 
     final settings = Provider.of<LanguageProvider>(context, listen: false);
+    // [METRICS] Start response time measurement
+    final metricsStopwatch = Stopwatch()..start();
 
     setState(() {
       _busy = true;
@@ -187,6 +205,19 @@ class _OcrScreenState extends State<OcrScreen> with WidgetsBindingObserver {
       await recognizer.close();
 
       final text = result.text.trim();
+
+      // [METRICS] Log OCR result (non-blocking, silent fail)
+      try {
+        metricsStopwatch.stop();
+        MetricsLogger().logDetection(
+          module: 'ocr',
+          input: 'camera_frame_manual',
+          actualOutput: text.isEmpty ? '[no_text]' : text.length > 80 ? '${text.substring(0, 80)}...' : text,
+          success: text.isNotEmpty,
+          confidence: text.isNotEmpty ? 1.0 : 0.0,
+          responseTime: metricsStopwatch.elapsedMilliseconds / 1000.0,
+        );
+      } catch (_) {}
 
       _ocrText = text.isEmpty
           ? AppLocalizations.t(context, 'no_text_recognized_yet')
