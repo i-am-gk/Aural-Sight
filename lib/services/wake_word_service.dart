@@ -13,6 +13,7 @@ import '../screens/gesture_screen.dart';
 import '../screens/object_detection_screen.dart';
 import '../screens/ocr_screen.dart';
 import '../screens/settings_screen.dart';
+import 'metrics_logger.dart';
 import 'tts_service.dart';
 
 class WakeWordService {
@@ -103,7 +104,23 @@ class WakeWordService {
       }
 
       if (_isCommandMode) {
+        // [METRICS] Measure voice command response time
+        final voiceStopwatch = Stopwatch()..start();
         final handled = await _handleCommand(rawText);
+        voiceStopwatch.stop();
+
+        // [METRICS] Log voice command result (non-blocking, silent fail)
+        try {
+          MetricsLogger().logDetection(
+            module: 'voice',
+            input: rawText,
+            actualOutput: handled ? 'command_executed' : 'not_recognized',
+            success: handled,
+            confidence: 1.0,
+            responseTime: voiceStopwatch.elapsedMilliseconds / 1000.0,
+          );
+        } catch (_) {}
+
         if (handled) {
           _resetCommandMode();
         } else {
@@ -279,6 +296,7 @@ Future<void> _activateCommandMode(String text) async {
   }
 
 bool _isObjectDetection(String text) {
+    if (text.contains('i am listening object detection')) return true;
   if (text.contains('object detection')) return true;
   if (text.contains('Object Detection')) return true;
   if (text.contains('object detect')) return true;
@@ -287,13 +305,20 @@ bool _isObjectDetection(String text) {
   if (text.contains('detect object')) return true;
   if (text.contains('find objects')) return true;
   if (text.contains('Find Objects')) return true;
+  // --- NEW FALLBACK: check for key words ---
+  String lower = text.toLowerCase();
+  if (lower.contains('object') && (lower.contains('detection') || lower.contains('detect') || lower.contains('find'))) {
+    return true;
+  }
   return false;
 }
 
 bool _isOcrMode(String text) {
-  // 🔥 PRIMARY - Word Reading
+  // Primary
+  if (text.contains('i am listening word reading')) return true;
   if (text.contains('word reading')) return true;
-  if (text.contains('Word Reading')) return true;
+  if (text.contains('i am listening Word Reading')) return true;
+   if (text.contains('Word Reading')) return true;
   if (text.contains('WORD READING')) return true;
   if (text.contains('reading word')) return true;
   if (text.contains('Reading Word')) return true;
@@ -301,58 +326,60 @@ bool _isOcrMode(String text) {
   if (text.contains('Word Read')) return true;
   if (text.contains('read word')) return true;
   if (text.contains('Read Word')) return true;
-  
-  // 🔥 Common mishearings
-  if (text.contains('word redeeming')) return true;
+
+  // Common mishearings
+  if (text.contains('i am listening word redeeming')) return true;
+   if (text.contains('word redeeming')) return true;
   if (text.contains('word reding')) return true;
-  if (text.contains('void reading')) return true;
+  if (text.contains('i am listening void reading')) return true;
+   if (text.contains('void reading')) return true;
   if (text.contains('ward reading')) return true;
   if (text.contains('werd reading')) return true;
   if (text.contains('word reed')) return true;
   if (text.contains('reading words')) return true;
   if (text.contains('word reader')) return true;
   if (text.contains('Word Reader')) return true;
-  
-  // 🔥 Catch if "word" + "read/reading" appears anywhere
+  if (text.contains('reding mode')) return true;              // added
+  if (text.contains('read mode')) return true;                // added
+
+  // Catch if "word" + "read/reading" appear anywhere
   if (text.contains('word') && text.contains('read')) return true;
   if (text.contains('word') && text.contains('reed')) return true;
   if (text.contains('word') && text.contains('red')) return true;
   if (text.contains('word') && text.contains('reading')) return true;
   if (text.contains('reading') && text.contains('mode')) return true;
-  
-  // 🔥 Catch "reading" or "reeding"
+
+  // Catch "reading" or "reeding"
   if (text.contains('reading')) return true;
   if (text.contains('Reading')) return true;
   if (text.contains('reeding')) return true;
-  
+
   return false;
 }
 
 bool _isGestureMode(String text) {
-  final lower = text.toLowerCase();
-  
-  // 🔥 PRIMARY - "detect hand"
+  final lower = text.toLowerCase();   // case‑insensitive
+
+  // Primary – "detect hand"
+  if (lower.contains('i am listening detect hand')) return true;
   if (lower.contains('detect hand')) return true;
-  if (lower.contains('Detect Hand')) return true;
+  if (lower.contains('Detect Hand')) return true; // redundant but ok
   if (lower.contains('DETECT HAND')) return true;
-  
-  // 🔥 VARIATIONS
-  if (lower.contains('detect hand')) return true;
-  if (lower.contains('detect hands')) return true;
   if (lower.contains('hand detect')) return true;
   if (lower.contains('hand detection')) return true;
   if (lower.contains('hands')) return true;
-  
-  // 🔥 COMMON MISHEARINGS FROM LOGS
+
+  // Common mishearings
   if (lower.contains('detect and')) return true;        // "detect and" → "detect hand"
   if (lower.contains('detect an')) return true;         // "detect an"
   if (lower.contains('and detection')) return true;     // "and detection" → "hand detection"
-  if (lower.contains('hen detection')) return true;     // "hen detection"
+  if (lower.contains('i am listening hen detection')) return true; 
+  if (lower.contains('hen detection')) return true; 
   if (lower.contains('hearn detection')) return true;   // "hearn detection"
-  
-  // 🔥 IF "detect" + "hand" appear anywhere
+  if (lower.contains('hern detection')) return true;    // added
+  // If "detect" and "hand" both appear
   if (lower.contains('detect') && lower.contains('hand')) return true;
-  
+
   return false;
 }
 
@@ -368,90 +395,104 @@ bool _isGestureMode(String text) {
   if (text.contains('opening set')) return true;    // Vosk hears this
   if (text.contains('open set it')) return true;    // Vosk hears this
   if (text.contains('opensetting')) return true;    // Spoken fast
-  
+  if (text.contains('open set')) return true;               // added
+  if (text.contains('opening settings')) return true;       
   // 🔥 SAFE FALLBACK - Only if "open" AND "set" are both present
   if (text.contains('open') && text.contains('set')) return true;
   if (text.contains('opening') && text.contains('set')) return true;
   
   return false;
 }
- bool _isGoBack(String text) {
-  // 🔥 EXACT MATCHES
+
+bool _isGoBack(String text) {
+  // Exact
   if (text.contains('go back')) return true;
-  
-  // 🔥 COMMON MISHEARINGS (SAFE - not too broad)
-  if (text.contains('go bck')) return true;    // Missing 'a'
-  if (text.contains('goback')) return true;    // One word
-  if (text.contains('go bad')) return true;    // Vosk hears this sometimes
-  if (text.contains('go backet')) return true; // Vosk adds extra sound
-  if (text.contains('go ba')) return true;     // Cut off speech
-  
-  // 🔥 SAFE FALLBACK - Only if "go" AND "back" are both present
+  if (text.contains('i am listening go back')) return true;
+
+
+  // Mishearings
+  if (text.contains('go bck')) return true;
+  if (text.contains('goback')) return true;
+  if (text.contains('go bad')) return true;
+  if (text.contains('go backet')) return true;
+  if (text.contains('go ba')) return true;
+  if (text.contains('go bak')) return true;                // added
+  if (text.contains('gobak')) return true;                 // added
+
+  // Safe fallback – "go" and "back"
   if (text.contains('go') && text.contains('back')) return true;
-  
+
   return false;
 }
 
-  bool _isFontBigger(String text) {
-    if (text.contains('font bigger')) return true;
-    if (text.contains('font be good')) return true;
-    if (text.contains('font be gooder')) return true;
-    if (text.contains('font be bigger')) return true;
-    if (text.contains('font big')) return true;
-    if (text.contains('font biggest')) return true;
-    if (text.contains('font biggerest')) return true;
-    if (text.contains('far bigger')) return true;
-    if (text.contains('far be good')) return true;
-    if (text.contains('for bigger')) return true;
-    if (text.contains('for be good')) return true;
-    if (text.contains('fotn bigger')) return true;
-    if (text.contains('fotn biggest')) return true;
-    if (text.contains('fotn bgigest')) return true;
-    if (text.contains('fotn be good')) return true;
-    if (text.contains('font bgigest')) return true;
-    if (text.contains('font bgger')) return true;
-    if (text.contains('font') && (text.contains('bigger') || text.contains('big'))) return true;
-    return false;
-  }
+bool _isFontBigger(String text) {
+  if (text.contains('i am listening font bigger')) return true;
+   if (text.contains('font bigger')) return true;
+  if (text.contains('font be good')) return true;
+  if (text.contains('font be gooder')) return true;
+  if (text.contains('font be bigger')) return true;
+  if (text.contains('font big')) return true;
+  if (text.contains('font biggest')) return true;
+  if (text.contains('font biggerest')) return true;
+  if (text.contains('far bigger')) return true;
+  if (text.contains('far be good')) return true;
+  if (text.contains('for bigger')) return true;
+  if (text.contains('for be good')) return true;
+  if (text.contains('fotn bigger')) return true;
+  if (text.contains('fotn biggest')) return true;
+  if (text.contains('fotn bgigest')) return true;
+  if (text.contains('fotn be good')) return true;
+  if (text.contains('font bgigest')) return true;
+  if (text.contains('font bgger')) return true;
+  if (text.contains('font') && (text.contains('bigger') || text.contains('big'))) return true;
+  if (text.contains('font') && text.contains('increase')) return true;   // added
+  if (text.contains('big font')) return true;                           // added
+  return false;
+}
 
-  bool _isFontSmaller(String text) {
-    if (text.contains('font smaller')) return true;
-    if (text.contains('font small')) return true;
-    if (text.contains('font smol')) return true;
-    if (text.contains('font smoller')) return true;
-    if (text.contains('font smallish')) return true;
-    if (text.contains('font smal')) return true;
-    if (text.contains('font smallerest')) return true;
-    if (text.contains('far smaller')) return true;
-    if (text.contains('for smaller')) return true;
-    if (text.contains('fotn smaller')) return true;
-    if (text.contains('fotn small')) return true;
-    if (text.contains('fotn smal')) return true;
-    if (text.contains('font') && (text.contains('smaller') || text.contains('small'))) return true;
-    return false;
-  }
+bool _isFontSmaller(String text) {
+  if (text.contains('i am listening font smaller')) return true;
+  if (text.contains('font smaller')) return true;
+  if (text.contains('font small')) return true;
+  if (text.contains('font smol')) return true;
+  if (text.contains('font smoller')) return true;
+  if (text.contains('font smallish')) return true;
+  if (text.contains('font smal')) return true;
+  if (text.contains('font smallerest')) return true;
+  if (text.contains('far smaller')) return true;
+  if (text.contains('for smaller')) return true;
+  if (text.contains('fotn smaller')) return true;
+  if (text.contains('fotn small')) return true;
+  if (text.contains('fotn smal')) return true;
+  if (text.contains('font') && (text.contains('smaller') || text.contains('small'))) return true;
+  if (text.contains('font') && text.contains('decrease')) return true;   // added
+  if (text.contains('small font')) return true;                         // added
+  return false;
+}
 
-  bool _isChangeTheme(String text) {
-    if (text.contains('change theme')) return true;
-    if (text.contains('changed theme')) return true;
-    if (text.contains('change team')) return true;
-    if (text.contains('chanegd team')) return true;
-    if (text.contains('chaneg team')) return true;
-    if (text.contains('change teams')) return true;
-    if (text.contains('chaneg teams')) return true;
-    if (text.contains('james team')) return true;
-    if (text.contains('james teams')) return true;
-    if (text.contains('james theme')) return true;
-    if (text.contains('jame team')) return true;
-    if (text.contains('jame theme')) return true;
-    if (text.contains('chain theme')) return true;
-    if (text.contains('chain team')) return true;
-    if ((text.contains('change') || text.contains('chaneg')) &&
-        (text.contains('team') || text.contains('theme'))) {
-      return true;
-    }
-    return false;
+bool _isChangeTheme(String text) {
+  if (text.contains('i am listening change theme')) return true;
+  if (text.contains('change theme')) return true;
+  if (text.contains('changed theme')) return true;
+  if (text.contains('change team')) return true;
+  if (text.contains('chanegd team')) return true;
+  if (text.contains('chaneg team')) return true;
+  if (text.contains('change teams')) return true;
+  if (text.contains('chaneg teams')) return true;
+  if (text.contains('i am listening james team')) return true;
+  if (text.contains('james team')) return true;
+  if (text.contains('james teams')) return true;
+  if (text.contains('james theme')) return true;
+  if (text.contains('jame team')) return true;
+  if (text.contains('jame theme')) return true;
+  if (text.contains('chain theme')) return true;
+  if (text.contains('chain team')) return true;
+  if ((text.contains('change') || text.contains('chaneg')) &&
+      (text.contains('team') || text.contains('theme'))) {
+    return true;
   }
+  return false;
+}
 
   void _resetCommandMode() {
     if (!_isCommandMode) return;
