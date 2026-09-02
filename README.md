@@ -337,35 +337,3 @@ Potential future improvements include:
 Aural Sight is more than a software project.
 
 It is an attempt to use modern technology to create a more accessible, independent, and inclusive world for visually impaired individuals.
-
-"Technology should not replace independence — it should enable it."
-
-<p align="center">
-👁️ Aural Sight
-
-AI-Powered Assistive Technology
-
-Made with ❤️ for Accessibility
-
-</p> ```
-📌 One important thing
-
-Put your uploaded image here in the project:
-
-assets/images/mapplogo4.png
-
-Then this part of the README will automatically display it on GitHub:
-
-<p align="center">
-  <img src="assets/images/mapplogo4.png" alt="Aural Sight Logo" width="500"/>
-</p>
-
-I also corrected the presentation of the team section so it looks professional:
-
-Made By
-Ghani Abdul Reman Khan
-Sardar Hasnain Hamid
-Mahnoor Kalsoom
-
-Supervisor
-Dr. Rabnawaz Jadoon
