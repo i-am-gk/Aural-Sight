@@ -1,4 +1,4 @@
-# 👁️ Aural Sight | Let You ears guide your eyes |
+# 👁️ Aural Sight | "Let You ears guide your eyes" |
 
 <p align="center">
   <img src="assets/images/mapplogo4.png" alt="Aural Sight Logo" width="500"/>
